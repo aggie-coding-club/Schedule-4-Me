@@ -142,6 +142,53 @@ def getDateFromDay(dayName):
 
     return nextDate
 
+
+# Create a JSON object of the Google Calendar event to create
+def createGCalendarEvent(name, day, startHr, startMin, endHr, endMin):
+    event = {
+        'summary': name,
+
+        # No location for now (change if we add location feature)
+        # 'location': '800 Howard St., San Francisco, CA 94103',
+
+        # No description for now
+        # 'description': 'A chance to hear more about Google\'s developer products.',
+
+        'start': {
+            'dateTime': day + 'T' + startHr + ':' + startMin + ":00-06:00",  # -6 hours from UTC for Chicago time (change if timeZone changes)
+            #'dateTime': '2015-05-28T09:00:00-07:00',
+            'timeZone': 'America/Chicago',  # Using Chicago for right now (change if app is widely used)
+        },
+
+        'end': {
+            'dateTime': day + 'T' + endHr + ':' + endMin + ":00-06:00",  # -6 hours from UTC for Chicago time (change if timeZone changes)
+            'timeZone': 'America/Chicago',  # Using Chicago for right now (change if app is widely used)
+        },
+
+        # Since the tasks for time blocks are each included in the arrays, recurrence is not needed
+        # 'recurrence': [
+        #     'RRULE:FREQ=DAILY;COUNT=2'
+        # ],
+        
+        # Attendees for now are just the user
+        # 'attendees': [
+        #     {'email': 'lpage@example.com'},
+        #     {'email': 'sbrin@example.com'},
+        # ],
+
+        # Reminders will be this default (from API guide), change if app offers notification reminders
+        'reminders': {
+            'useDefault': False,
+            'overrides': [
+            {'method': 'email', 'minutes': 24 * 60},
+            {'method': 'popup', 'minutes': 10},
+            ],
+        },
+    }
+
+    return event
+
+
 '''
 Success page view:
 Processes the final schedule and displays a success message, offering the user options to 
@@ -186,8 +233,8 @@ def successPage(request):
         endTimeMin = thisEnd[3:]
 
         # If the end time hour is 24 (task ends at midnight, or goes into the next day), make the time 23:59
-        endTimeMin = 59 if endTimeHour == 24 else endTimeMin
-        endTimeHour = 23 if endTimeHour == 24 else endTimeHour
+        endTimeMin = "59" if endTimeHour == "24" else endTimeMin
+        endTimeHour = "23" if endTimeHour == "24" else endTimeHour
 
         taskStartHours.append(startTimeHour)
         taskStartMins.append(startTimeMin)
@@ -272,47 +319,14 @@ def successPage(request):
 
             # This chunk of 50 tasks
             for j in range(i * 50, i * 50 + 50):
-                # Create the event for the task
-                event = {
-                    'summary': taskNames[i],
-
-                    # No location for now (change if we add location feature)
-                    # 'location': '800 Howard St., San Francisco, CA 94103',
-
-                    # No description for now
-                    # 'description': 'A chance to hear more about Google\'s developer products.',
-
-                    'start': {
-                        'dateTime': str(getDateFromDay(taskDays[i])) + 'T' + taskStartHours[i] + ':' + taskStartMins[i] + ":00-06:00",  # -6 hours from UTC for Chicago time (change if timeZone changes)
-                        #'dateTime': '2015-05-28T09:00:00-07:00',
-                        'timeZone': 'America/Chicago',  # Using Chicago for right now (change if app is widely used)
-                    },
-
-                    'end': {
-                        'dateTime': str(getDateFromDay(taskDays[i])) + 'T' + taskEndHours[i] + ':' + taskEndMins[i] + ":00-06:00",  # -6 hours from UTC for Chicago time (change if timeZone changes)
-                        'timeZone': 'America/Chicago',  # Using Chicago for right now (change if app is widely used)
-                    },
-
-                    # Since the tasks for time blocks are each included in the arrays, recurrence is not needed
-                    # 'recurrence': [
-                    #     'RRULE:FREQ=DAILY;COUNT=2'
-                    # ],
-                    
-                    # Attendees for now are just the user
-                    # 'attendees': [
-                    #     {'email': 'lpage@example.com'},
-                    #     {'email': 'sbrin@example.com'},
-                    # ],
-
-                    # Reminders will be this default (from API guide), change if app offers notification reminders
-                    'reminders': {
-                        'useDefault': False,
-                        'overrides': [
-                        {'method': 'email', 'minutes': 24 * 60},
-                        {'method': 'popup', 'minutes': 10},
-                        ],
-                    },
-                }
+                event = createGCalendarEvent(
+                    taskNames[i],
+                    str(getDateFromDay(taskDays[i])),
+                    taskStartHours[i],
+                    taskStartMins[i],
+                    taskEndHours[i],
+                    taskEndMins[i]
+                )
 
                 batch.add(
                     service.events().insert(
@@ -329,47 +343,14 @@ def successPage(request):
         batch = service.new_batch_http_request()
 
         for i in range(offset, offset + remainder):
-            # Create the event for the task
-            event = {
-                'summary': taskNames[i],
-
-                # No location for now (change if we add location feature)
-                # 'location': '800 Howard St., San Francisco, CA 94103',
-
-                # No description for now
-                # 'description': 'A chance to hear more about Google\'s developer products.',
-
-                'start': {
-                    'dateTime': str(getDateFromDay(taskDays[i])) + 'T' + taskStartHours[i] + ':' + taskStartMins[i] + ":00-06:00",  # -6 hours from UTC for Chicago time (change if timeZone changes)
-                    #'dateTime': '2015-05-28T09:00:00-07:00',
-                    'timeZone': 'America/Chicago',  # Using Chicago for right now (change if app is widely used)
-                },
-
-                'end': {
-                    'dateTime': str(getDateFromDay(taskDays[i])) + 'T' + taskEndHours[i] + ':' + taskEndMins[i] + ":00-06:00",  # -6 hours from UTC for Chicago time (change if timeZone changes)
-                    'timeZone': 'America/Chicago',  # Using Chicago for right now (change if app is widely used)
-                },
-
-                # Since the tasks for time blocks are each included in the arrays, recurrence is not needed
-                # 'recurrence': [
-                #     'RRULE:FREQ=DAILY;COUNT=2'
-                # ],
-                
-                # Attendees for now are just the user
-                # 'attendees': [
-                #     {'email': 'lpage@example.com'},
-                #     {'email': 'sbrin@example.com'},
-                # ],
-
-                # Reminders will be this default (from API guide), change if app offers notification reminders
-                'reminders': {
-                    'useDefault': False,
-                    'overrides': [
-                    {'method': 'email', 'minutes': 24 * 60},
-                    {'method': 'popup', 'minutes': 10},
-                    ],
-                },
-            }
+            event = createGCalendarEvent(
+                taskNames[i],
+                str(getDateFromDay(taskDays[i])),
+                taskStartHours[i],
+                taskStartMins[i],
+                taskEndHours[i],
+                taskEndMins[i]
+            )
 
             batch.add(
                 service.events().insert(

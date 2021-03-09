@@ -448,11 +448,11 @@ function timeSlot(md, tu, wd, th, fr, sa, su) {
 function createSchedule(tdl, schedule) {
     const numTasks = tdl.tasks.length;
     var taskPlaced = false;
-    var tasksPlaced = 1;    // delete later
+    //var tasksPlaced = 1;    // delete later
 
     for (var i = 0; i < numTasks; i++) {
         taskPlaced = false;
-        tasksPlaced++;
+        //tasksPlaced++;
         for (var j = 0; j < 7; j++) {
             if (taskPlaced) {
                 taskPlaced = false;
