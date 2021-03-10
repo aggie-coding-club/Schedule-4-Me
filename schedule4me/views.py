@@ -29,13 +29,19 @@ def landingPage(request):
 
 '''
 Dashboard page view:
-*** Not yet implemented
 The main menu page for a user that has signed in/connected their Google account. The page
-is a hub that shows all of their previously created schedules/templates. Renders
+is a hub that shows all of their previously created schedules. Renders
 dashboard.html
 '''
 def dashboardPage(request):
-    return render(request, 'dashboard.html')
+    # query database for user's schedules
+    schedules = Schedule.objects.filter(user = str(request.user))
+    scheduleNames = []
+    for s in schedules:
+        scheduleNames.append(s.schedule_name)
+
+    context = { 'scheduleNames': scheduleNames }
+    return render(request, 'dashboard.html', context)
 
 
 '''
@@ -259,6 +265,13 @@ def successPage(request):
             ),            
         )
         newTask.save()
+    
+    # Save new Schedule object
+    newSchedule = Schedule(
+        schedule_name = request.POST.get("schedule-name"),
+        user = str(request.user)
+    )
+    newSchedule.save()
 
     social_token = SocialToken.objects.get(account__user=request.user)
 

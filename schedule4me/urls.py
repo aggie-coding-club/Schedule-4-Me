@@ -7,4 +7,5 @@ urlpatterns = [
     path('output', views.outputPage, name='output'),
     path('success', views.successPage, name='success'),
     path('import', views.importPage, name='import'),
+    path('dashboard', views.dashboardPage, name='dashboard')
 ]

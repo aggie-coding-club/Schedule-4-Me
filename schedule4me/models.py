@@ -39,5 +39,8 @@ class OptimizedTask(models.Model):
     def __str__(self):
         return self.task_name
 
-
+class Schedule(models.Model):
+    schedule_id = models.IntegerField(primary_key=True)
+    schedule_name = models.CharField(max_length=200)
+    user = models.CharField(max_length=200)
 
