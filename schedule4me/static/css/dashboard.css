@@ -6,3 +6,8 @@
     - Dean Orenstein
     - Gage Aykroyd
 */
+
+.schedule-row {
+    border: 3px solid rgb(107, 107, 107);
+    border-radius: 3px;
+}

@@ -38,11 +38,28 @@
     </nav>
 
     <div id="user-schedules">
-        <h1>My Schedules</h1>
-        <a id="btn-home" class="btn btn-danger btn-lg" role="button" href="{% url 'data-enter' %}">Make New Schedule</a>
+        <div class="row justify-content-md-center">
+            <h1>My Schedules</h1>
+        </div>
+        <div class="row justify-content-md-center">
+            <a id="btn-home" class="btn btn-danger btn-lg" role="button" href="{% url 'data-enter' %}">Make New Schedule</a>
+        </div>
+        <br>
+        
         {% for s in scheduleNames %}
-            <div class="schedule-row">
-                <h5>s</h5>
+            <div class="row schedule-row">
+                <div class="col-md-6">
+                    <h3>s</h3>
+                </div>
+                <div class="col-md-2">
+                    <i class="fas fa-eye"></i><input type="button" class="btn btn-primary" value="View">
+                </div>
+                <div class="col-md-2">
+                    <i class="fas fa-edit"></i><input type="button" class="btn btn-primary" value="Edit">
+                </div>
+                <div class="col-md-2">
+                    <i class="fas fa-trash"></i><input type="button" class="btn btn-danger" value="Delete">
+              </div>
             </div>
         {% endfor %}
     </div>
